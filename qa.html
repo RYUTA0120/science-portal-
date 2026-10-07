@@ -7,28 +7,16 @@
 <style>
 :root{--g:#059669;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--bg:#f7f9fc}
 *{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;background:var(--bg);color:var(--ink)}
-main{max-width:980px;margin:auto;padding:42px 22px 90px}.brand{font-size:13px;font-weight:800;letter-spacing:.15em;color:var(--g)}
-h1{font-size:40px;margin:8px 0}.lead{color:var(--muted);line-height:1.75}.tools{display:grid;grid-template-columns:1fr 230px;gap:12px;margin:26px 0}
-input,select{padding:13px;border:1px solid var(--line);border-radius:13px;background:#fff;font:inherit}.qa,.notice{background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px;margin-top:14px}
-.q{font-size:18px;font-weight:800;line-height:1.6}.a{margin-top:12px;line-height:1.8;white-space:pre-wrap}.tag{display:inline-block;background:#ecfdf5;color:#047857;border-radius:10px;padding:5px 9px;font-size:12px;font-weight:800;margin-bottom:10px}
-.back{display:inline-block;background:#0f172a;color:#fff;text-decoration:none;padding:11px 15px;border-radius:13px;font-weight:700;margin-bottom:25px}@media(max-width:650px){.tools{grid-template-columns:1fr}h1{font-size:32px}}
+main{max-width:980px;margin:auto;padding:42px 22px 90px}.brand{font-size:13px;font-weight:800;letter-spacing:.15em;color:var(--g)}h1{font-size:40px;margin:8px 0}.lead{color:var(--muted);line-height:1.75}.tools{display:grid;grid-template-columns:1fr 230px;gap:12px;margin:26px 0}input,select{padding:13px;border:1px solid var(--line);border-radius:13px;background:#fff;font:inherit}.qa,.notice{background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px;margin-top:14px}.q{font-size:18px;font-weight:800;line-height:1.6}.a{margin-top:12px;line-height:1.8;white-space:pre-wrap}.tag{display:inline-block;background:#ecfdf5;color:#047857;border-radius:10px;padding:5px 9px;font-size:12px;font-weight:800;margin-bottom:10px}.back{display:inline-block;background:#0f172a;color:#fff;text-decoration:none;padding:11px 15px;border-radius:13px;font-weight:700;margin-bottom:25px}@media(max-width:650px){.tools{grid-template-columns:1fr}h1{font-size:32px}}
 </style>
-</head>
-<body><main>
-<a class="back" href="index.html">← ポータルへ戻る</a>
-<div class="brand">SCIENCE PORTAL / Q&amp;A</div><h1>みんなのQ&amp;A</h1>
-<p class="lead">公開許可のある質問を匿名で掲載しています。</p>
+</head><body><main>
+<a class="back" href="index.html">← ポータルへ戻る</a><div class="brand">SCIENCE PORTAL / Q&amp;A</div><h1>みんなのQ&amp;A</h1><p class="lead">公開許可のある質問を匿名で掲載しています。</p>
 <div class="tools"><input id="search" placeholder="キーワードで検索"><select id="cat"><option value="">すべての分野</option></select></div>
 <div id="status" class="notice">Q&amp;Aを読み込んでいます…</div><div id="list"></div>
-</main>
-<script>
-const SHEET_ID='12Ecaf8Qs8PYKCG2SnkiipitcVPtPy6i31RbhbIXVrIA';
-const GID='203732322';
-const CB='qa_cb_'+Date.now();
-const statusEl=document.getElementById('status'), list=document.getElementById('list'), search=document.getElementById('search'), cat=document.getElementById('cat');
-let data=[];
-function render(){const q=search.value.trim().toLowerCase(), c=cat.value;const rows=data.filter(x=>(!c||x.category===c)&&(!q||(x.category+' '+x.unit+' '+x.question+' '+x.answer).toLowerCase().includes(q)));list.innerHTML='';statusEl.style.display=rows.length?'none':'block';if(!rows.length)statusEl.textContent=data.length?'該当するQ&Aがありません。':'Q&Aはこれから追加していきます。';for(const x of rows){const d=document.createElement('div');d.className='qa';d.innerHTML='<span class="tag"></span><div class="q"></div><div class="a"></div>';d.querySelector('.tag').textContent=x.category+(x.unit?'｜'+x.unit:'');d.querySelector('.q').textContent='Q. '+x.question;d.querySelector('.a').textContent='A. '+x.answer;list.appendChild(d)}}
-window[CB]=function(res){try{const table=res.table;if(!table||!table.cols)throw Error('no table');const heads=table.cols.map(c=>(c.label||'').trim());const idx=(names)=>names.map(n=>heads.indexOf(n)).find(i=>i>=0)??-1;let iu=idx(['単元']),ic=idx(['分野']),iq=idx(['質問']),ia=idx(['解答','回答']);if([iu,ic,iq,ia].some(i=>i<0))throw Error('headers: '+heads.join(','));data=(table.rows||[]).map(r=>{const v=i=>r.c&&r.c[i]&&r.c[i].v!=null?String(r.c[i].v):'';return{unit:v(iu),category:v(ic),question:v(iq),answer:v(ia)}}).filter(x=>x.question&&x.answer);[...new Set(data.map(x=>x.category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ja')).forEach(v=>{const o=document.createElement('option');o.value=o.textContent=v;cat.appendChild(o)});render()}catch(e){statusEl.textContent='Q&Aを読み込めませんでした。公開用Q&Aの見出し（単元・分野・質問・解答）を確認してください。';console.error(e)}finally{delete window[CB]}};
-const s=document.createElement('script');s.src='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?gid='+GID+'&headers=1&tqx=out:json;responseHandler:'+CB+'&t='+Date.now();s.onerror=()=>{statusEl.textContent='Q&Aを読み込めませんでした。Googleスプレッドシートの公開設定を確認してください。'};document.head.appendChild(s);
-search.oninput=render;cat.onchange=render;
+</main><script>
+const CSV_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vRf-TNvgWv0-_WQeZx4v0KHqefIEt-PkWdqZaJdxVPp6k2VKEmdypGRxFJpgMm7hyZSY66Sj6N32_7n/pub?gid=575951089&single=true&output=csv';
+const st=document.getElementById('status'),list=document.getElementById('list'),search=document.getElementById('search'),cat=document.getElementById('cat');let data=[];
+function parseCSV(t){const rows=[];let row=[],cell='',quoted=false;for(let i=0;i<t.length;i++){const c=t[i],n=t[i+1];if(c==='"'){if(quoted&&n==='"'){cell+='"';i++}else quoted=!quoted}else if(c===','&&!quoted){row.push(cell);cell=''}else if((c==='\n'||c==='\r')&&!quoted){if(c==='\r'&&n==='\n')i++;row.push(cell);if(row.some(v=>v!==''))rows.push(row);row=[];cell=''}else cell+=c}row.push(cell);if(row.some(v=>v!==''))rows.push(row);return rows}
+function render(){const q=search.value.trim().toLowerCase(),c=cat.value;const rows=data.filter(x=>(!c||x.category===c)&&(!q||(x.category+' '+x.unit+' '+x.question+' '+x.answer).toLowerCase().includes(q)));list.innerHTML='';st.style.display=rows.length?'none':'block';if(!rows.length)st.textContent=data.length?'該当するQ&Aがありません。':'Q&Aはこれから追加していきます。';rows.forEach(x=>{const d=document.createElement('div');d.className='qa';d.innerHTML='<span class="tag"></span><div class="q"></div><div class="a"></div>';d.querySelector('.tag').textContent=x.category+(x.unit?'｜'+x.unit:'');d.querySelector('.q').textContent='Q. '+x.question;d.querySelector('.a').textContent='A. '+x.answer;list.appendChild(d)})}
+fetch(CSV_URL,{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.arrayBuffer()}).then(buf=>{const text=new TextDecoder('utf-8').decode(buf);const rows=parseCSV(text);if(!rows.length)throw Error('empty');const h=rows[0].map(v=>v.trim());const find=names=>{for(const n of names){const i=h.indexOf(n);if(i>=0)return i}return -1};const ic=find(['分野']),iu=find(['単元']),iq=find(['質問']),ia=find(['解答','回答']);if([ic,iu,iq,ia].some(i=>i<0))throw Error('headers '+h.join('|'));data=rows.slice(1).map(r=>({category:r[ic]||'',unit:r[iu]||'',question:r[iq]||'',answer:r[ia]||''})).filter(x=>x.question&&x.answer);[...new Set(data.map(x=>x.category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ja')).forEach(v=>{const o=document.createElement('option');o.value=o.textContent=v;cat.appendChild(o)});render()}).catch(e=>{console.error(e);st.textContent='Q&Aを読み込めませんでした。Googleスプレッドシートの公開設定を確認してください。'});search.oninput=render;cat.onchange=render;
 </script></body></html>
