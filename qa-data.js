@@ -1,0 +1,1 @@
+window.QA_DATA=[{category:"中三化学",question:"塩酸はなぜ電流を流すの？",answer:"イオンになるため"}];
