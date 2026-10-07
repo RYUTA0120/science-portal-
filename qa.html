@@ -1,9 +1,34 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>みんなのQ&A | 理科授業ポータル</title><style>:root{--g:#059669;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--bg:#f7f9fc}*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;background:var(--bg);color:var(--ink)}main{max-width:980px;margin:auto;padding:42px 22px 90px}.brand{font-size:13px;font-weight:800;letter-spacing:.15em;color:var(--g)}h1{font-size:40px;margin:8px 0}.lead{color:var(--muted);line-height:1.75}.tools{display:grid;grid-template-columns:1fr 230px;gap:12px;margin:26px 0}input,select{padding:13px;border:1px solid var(--line);border-radius:13px;background:#fff;font:inherit}.qa,.notice{background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px;margin-top:14px}.q{font-size:18px;font-weight:800;line-height:1.6}.a{margin-top:12px;line-height:1.8}.tag{display:inline-block;background:#ecfdf5;color:#047857;border-radius:10px;padding:5px 9px;font-size:12px;font-weight:800;margin-bottom:10px}.back{display:inline-block;background:#0f172a;color:white;text-decoration:none;padding:11px 15px;border-radius:13px;font-weight:700;margin-bottom:25px}@media(max-width:650px){.tools{grid-template-columns:1fr}h1{font-size:32px}}</style></head><body><main><a class="back" href="index.html">← ポータルへ戻る</a><div class="brand">SCIENCE PORTAL / Q&A</div><h1>みんなのQ&A</h1><p class="lead">公開許可のある質問を匿名で掲載しています。</p><div class="tools"><input id="search" placeholder="キーワードで検索"><select id="cat"><option value="">すべての分野</option></select></div><div id="status" class="notice">Q&Aを読み込んでいます…</div><div id="list"></div></main><script>
-const CSV_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vRbQXDR-Ihuwj9CX38636stJ_vsOl9t1mBQoFK-50UEKetCmz9RmbNWjLXCN2mpBidZTfrH0vxSdd6x/pub?gid=203732322&single=true&output=csv';
-function parseCSV(t){const rows=[];let row=[],cell='',q=false;for(let i=0;i<t.length;i++){let c=t[i],n=t[i+1];if(c==='"'){if(q&&n==='"'){cell+='"';i++}else q=!q}else if(c===','&&!q){row.push(cell);cell=''}else if((c==='
-'||c==='')&&!q){if(c===''&&n==='
-')i++;row.push(cell);if(row.some(x=>x!==''))rows.push(row);row=[];cell=''}else cell+=c}row.push(cell);if(row.some(x=>x!==''))rows.push(row);return rows}
-const st=document.getElementById('status'),list=document.getElementById('list'),search=document.getElementById('search'),cat=document.getElementById('cat');let data=[];
-function render(){const q=search.value.trim().toLowerCase(),c=cat.value;const x=data.filter(z=>(!c||z.category===c)&&(!q||(z.category+' '+z.unit+' '+z.question+' '+z.answer).toLowerCase().includes(q)));list.innerHTML='';st.style.display=x.length?'none':'block';if(!x.length)st.textContent=data.length?'該当するQ&Aがありません。':'Q&Aはこれから追加していきます。';x.forEach(z=>{const d=document.createElement('div');d.className='qa';d.innerHTML='<span class="tag"></span><div class="q"></div><div class="a"></div>';d.querySelector('.tag').textContent=z.category+(z.unit?'｜'+z.unit:'');d.querySelector('.q').textContent='Q. '+z.question;d.querySelector('.a').textContent='A. '+z.answer;list.appendChild(d)})}
-fetch(CSV_URL).then(r=>{if(!r.ok)throw Error(r.status);return r.text()}).then(t=>{const rows=parseCSV(t);if(rows.length<1)throw Error('empty');const h=rows[0].map(x=>x.trim());const find=(names)=>{for(const n of names){const i=h.indexOf(n);if(i>=0)return i}return -1};const iu=find(['単元']),ic=find(['分野']),iq=find(['質問']),ia=find(['解答','回答']);if([iu,ic,iq,ia].some(i=>i<0))throw Error('headers');data=rows.slice(1).filter(r=>r[iq]&&r[ia]).map(r=>({unit:r[iu]||'',category:r[ic]||'',question:r[iq]||'',answer:r[ia]||''}));[...new Set(data.map(x=>x.category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ja')).forEach(v=>{const o=document.createElement('option');o.value=o.textContent=v;cat.appendChild(o)});render()}).catch(e=>{st.textContent='Q&Aを読み込めませんでした。公開用シートの公開設定を確認してください。';console.error(e)});search.oninput=render;cat.onchange=render;
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>みんなのQ&A | 理科授業ポータル</title>
+<style>
+:root{--g:#059669;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--bg:#f7f9fc}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;background:var(--bg);color:var(--ink)}
+main{max-width:980px;margin:auto;padding:42px 22px 90px}.brand{font-size:13px;font-weight:800;letter-spacing:.15em;color:var(--g)}
+h1{font-size:40px;margin:8px 0}.lead{color:var(--muted);line-height:1.75}.tools{display:grid;grid-template-columns:1fr 230px;gap:12px;margin:26px 0}
+input,select{padding:13px;border:1px solid var(--line);border-radius:13px;background:#fff;font:inherit}.qa,.notice{background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px;margin-top:14px}
+.q{font-size:18px;font-weight:800;line-height:1.6}.a{margin-top:12px;line-height:1.8;white-space:pre-wrap}.tag{display:inline-block;background:#ecfdf5;color:#047857;border-radius:10px;padding:5px 9px;font-size:12px;font-weight:800;margin-bottom:10px}
+.back{display:inline-block;background:#0f172a;color:#fff;text-decoration:none;padding:11px 15px;border-radius:13px;font-weight:700;margin-bottom:25px}@media(max-width:650px){.tools{grid-template-columns:1fr}h1{font-size:32px}}
+</style>
+</head>
+<body><main>
+<a class="back" href="index.html">← ポータルへ戻る</a>
+<div class="brand">SCIENCE PORTAL / Q&amp;A</div><h1>みんなのQ&amp;A</h1>
+<p class="lead">公開許可のある質問を匿名で掲載しています。</p>
+<div class="tools"><input id="search" placeholder="キーワードで検索"><select id="cat"><option value="">すべての分野</option></select></div>
+<div id="status" class="notice">Q&amp;Aを読み込んでいます…</div><div id="list"></div>
+</main>
+<script>
+const SHEET_ID='12Ecaf8Qs8PYKCG2SnkiipitcVPtPy6i31RbhbIXVrIA';
+const GID='203732322';
+const CB='qa_cb_'+Date.now();
+const statusEl=document.getElementById('status'), list=document.getElementById('list'), search=document.getElementById('search'), cat=document.getElementById('cat');
+let data=[];
+function render(){const q=search.value.trim().toLowerCase(), c=cat.value;const rows=data.filter(x=>(!c||x.category===c)&&(!q||(x.category+' '+x.unit+' '+x.question+' '+x.answer).toLowerCase().includes(q)));list.innerHTML='';statusEl.style.display=rows.length?'none':'block';if(!rows.length)statusEl.textContent=data.length?'該当するQ&Aがありません。':'Q&Aはこれから追加していきます。';for(const x of rows){const d=document.createElement('div');d.className='qa';d.innerHTML='<span class="tag"></span><div class="q"></div><div class="a"></div>';d.querySelector('.tag').textContent=x.category+(x.unit?'｜'+x.unit:'');d.querySelector('.q').textContent='Q. '+x.question;d.querySelector('.a').textContent='A. '+x.answer;list.appendChild(d)}}
+window[CB]=function(res){try{const table=res.table;if(!table||!table.cols)throw Error('no table');const heads=table.cols.map(c=>(c.label||'').trim());const idx=(names)=>names.map(n=>heads.indexOf(n)).find(i=>i>=0)??-1;let iu=idx(['単元']),ic=idx(['分野']),iq=idx(['質問']),ia=idx(['解答','回答']);if([iu,ic,iq,ia].some(i=>i<0))throw Error('headers: '+heads.join(','));data=(table.rows||[]).map(r=>{const v=i=>r.c&&r.c[i]&&r.c[i].v!=null?String(r.c[i].v):'';return{unit:v(iu),category:v(ic),question:v(iq),answer:v(ia)}}).filter(x=>x.question&&x.answer);[...new Set(data.map(x=>x.category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ja')).forEach(v=>{const o=document.createElement('option');o.value=o.textContent=v;cat.appendChild(o)});render()}catch(e){statusEl.textContent='Q&Aを読み込めませんでした。公開用Q&Aの見出し（単元・分野・質問・解答）を確認してください。';console.error(e)}finally{delete window[CB]}};
+const s=document.createElement('script');s.src='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?gid='+GID+'&headers=1&tqx=out:json;responseHandler:'+CB+'&t='+Date.now();s.onerror=()=>{statusEl.textContent='Q&Aを読み込めませんでした。Googleスプレッドシートの公開設定を確認してください。'};document.head.appendChild(s);
+search.oninput=render;cat.onchange=render;
 </script></body></html>
